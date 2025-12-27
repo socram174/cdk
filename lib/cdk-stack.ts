@@ -27,7 +27,8 @@ export class CdkStack extends Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       logGroup: bundLambdaLogGroup,
       bundling: {
-        format: OutputFormat.ESM
+        format: OutputFormat.ESM,
+        minify: true
       }
     });
 
