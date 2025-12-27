@@ -1,0 +1,45 @@
+name: Destroy CDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "destroy" to confirm destruction of all resources'
+        required: true
+        type: string
+
+env:
+  AWS_REGION: sa-east-1
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_destroy == 'destroy'
+
+    permissions:
+      id-token: write   # This is required for OIDC
+      contents: read    # This is required for actions/checkout
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        role-session-name: github-actions-cdk-destroy-${{ github.run_id }}
+        aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: false
+
+    - name: CDK Destroy
+      run: npx cdk destroy --require-approval never --force
