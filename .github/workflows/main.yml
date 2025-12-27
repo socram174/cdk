@@ -1,0 +1,50 @@
+name: Deploy CDK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: sa-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write   # This is required for OIDC
+      contents: read    # This is required for actions/checkout
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        role-session-name: github-actions-cdk-deploy-${{ github.run_id }}
+        aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: false
+
+    - name: CDK Bootstrap (only on main branch)
+      if: github.ref == 'refs/heads/main'
+      run: npx cdk bootstrap --qualifier testingcdk
+
+    - name: CDK Synth
+      run: npx cdk synth --qualifier testingcdk
+
+    - name: CDK Deploy
+      if: github.ref == 'refs/heads/main'
+      run: npx cdk deploy --qualifier testingcdk --require-approval never
