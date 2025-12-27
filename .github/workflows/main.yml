@@ -36,10 +36,9 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
         role-session-name: github-actions-cdk-deploy-${{ github.run_id }}
         aws-region: ${{ env.AWS_REGION }}
-        mask-aws-account-id: false
+        mask-aws-account-id: true
 
-    - name: CDK Bootstrap (only on main branch)
-      if: github.ref == 'refs/heads/main'
+    - name: CDK Bootstrap
       run: npx cdk bootstrap --qualifier testingcdk
 
     - name: CDK Synth
