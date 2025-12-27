@@ -3,7 +3,7 @@ import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
@@ -25,7 +25,10 @@ export class CdkStack extends Stack {
       functionName: 'esbuildTest',
       memorySize: 2048,
       runtime: lambda.Runtime.NODEJS_22_X,
-      logGroup: bundLambdaLogGroup
+      logGroup: bundLambdaLogGroup,
+      bundling: {
+        format: OutputFormat.ESM
+      }
     });
 
 
