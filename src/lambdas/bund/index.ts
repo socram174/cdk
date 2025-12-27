@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid"
+
 interface DefaultFunctionConfig {
     runtime: string
     memory: number
@@ -18,7 +20,8 @@ export const handler = async (event: any) => {
         statusCode: 200,
         body: JSON.stringify({
             message: "Bund lambda executed successfully with esbuild!",
-            config: lambdaConfig
+            config: lambdaConfig,
+            id: nanoid()
         })
     };
 };
