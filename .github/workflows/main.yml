@@ -39,11 +39,11 @@ jobs:
         mask-aws-account-id: true
 
     - name: CDK Bootstrap
-      run: npx cdk bootstrap --qualifier testingcdk
+      run: npx cdk bootstrap
 
     - name: CDK Synth
-      run: npx cdk synth --qualifier testingcdk
+      run: npx cdk synth
 
     - name: CDK Deploy
       if: github.ref == 'refs/heads/main'
-      run: npx cdk deploy --qualifier testingcdk --require-approval never
+      run: npx cdk deploy --require-approval never
